@@ -1,0 +1,6 @@
+GLTEST_ICON 		    ICON 	"gltest.ico"
+
+NO_ACTION_CURSOR	    CURSOR	"Cursors/no_action.cur"
+OPEN_HAND_CURSOR 	    CURSOR  "Cursors/open_hand.cur"
+GRIPPING_HAND_CURSOR	CURSOR	"Cursors/gripping_hand.cur"
+POINTING_HAND_CURSOR	CURSOR	"Cursors/pointing_hand.cur"

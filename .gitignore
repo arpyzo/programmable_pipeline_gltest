@@ -1,0 +1,12 @@
+Debug
+Release
+IPCH
+
+*.opensdf
+*.sdf
+*.suo
+*.TMP
+
+GLEW
+
+TODO.txt
