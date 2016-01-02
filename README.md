@@ -9,4 +9,4 @@ This demo makes use of wxWidgets to provide basic GUI features including an Open
 ## Demos
 
  * Minimal shader setup
- * Pipeline data input
+ * Pipeline data traversal
