@@ -37,10 +37,11 @@ Point_Scene::~Point_Scene() {
 }
 
 void Point_Scene::Render() {
-    const GLfloat red[] = { 1, 0, 0, 2 };
-    glClearBufferfv(GL_COLOR, 0, red);
+    const GLfloat color[] = { 0.5, 0.5, 0.5, 1.0 };
 
-    glPointSize((float)((animation_frame % 40) * 2));
+    glClearBufferfv(GL_COLOR, 0, color);
+
+    glPointSize(abs(sinf(animation_frame / 50) * 100));
 
     glUseProgram(rendering_program);
     glDrawArrays(GL_POINTS, 0, 1);
@@ -56,7 +57,7 @@ GLuint Point_Scene::Compile_Point_Shaders() {
         "#version 450 core                          \n"
         "                                           \n"
         "void main() {                              \n"
-        "   gl_Position = vec4(0.0, 0.0, 0.5, 1.0); \n"
+        "   gl_Position = vec4(0.0, 0.0, 1.0, 1.0); \n"
         "}                                          \n"
     };
 
@@ -66,7 +67,7 @@ GLuint Point_Scene::Compile_Point_Shaders() {
         "out vec4 color;                            \n"
         "                                           \n"
         "void main() {                              \n"
-        "   color = vec4(0.0, 0.0, 1.0, 1.0);       \n"
+        "   color = vec4(0.3, 0.3, 1.0, 1.0);       \n"
         "}                                          \n"
     };
 
@@ -103,10 +104,10 @@ Triangle_Scene::~Triangle_Scene() {
 }
 
 void Triangle_Scene::Render() {
-    GLfloat red[] = { 1, 0, 0, 2 };
-    glClearBufferfv(GL_COLOR, 0, red);
+    const GLfloat color[] = { 0.3, 0.3, 1.0, 1.0 };
+    glClearBufferfv(GL_COLOR, 0, color);
 
-    GLfloat offset[] = { (float)(animation_frame % 20 - 10) / 10, (float)(animation_frame % 20 - 10) / 10, 0, 0 };
+    GLfloat offset[] = { sinf(animation_frame / 30) * 0.7, cosf(animation_frame / 30) * 0.7, 0, 0 };
     glVertexAttrib4fv(0, offset);
 
     glUseProgram(rendering_program);
@@ -139,7 +140,7 @@ GLuint Triangle_Scene::Compile_Triangle_Shaders() {
         "out vec4 color;                            \n"
         "                                           \n"
         "void main() {                              \n"
-        "   color = vec4(0.0, 1.0, 0.0, 1.0);       \n"
+        "   color = vec4(0.2, 1.0, 0.2, 1.0);       \n"
         "}                                          \n"
     };
 

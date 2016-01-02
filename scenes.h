@@ -1,9 +1,9 @@
 #ifndef __SCENES_H
 #define __SCENES_H
 
-#include "GLEW/glew.h"
+#pragma warning (disable : 4305)
 
-//#include <wx/wx.h>
+#include "GLEW/glew.h"
 
 /***************************** Scene ******************************/
 class Scene {
@@ -23,7 +23,7 @@ class Scene {
     protected:
         virtual void Generate_Polygons() {}
 
-        long animation_frame = 0;
+        float animation_frame = 0;
 };
 
 /***************************** Point_Scene ******************************/
