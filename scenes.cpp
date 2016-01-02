@@ -37,9 +37,9 @@ Point_Scene::~Point_Scene() {
 }
 
 void Point_Scene::Render() {
-    const GLfloat color[] = { 0.5, 0.5, 0.5, 1.0 };
+    const GLfloat gray[] = { 0.5, 0.5, 0.5, 1.0 };
 
-    glClearBufferfv(GL_COLOR, 0, color);
+    glClearBufferfv(GL_COLOR, 0, gray);
 
     glPointSize(abs(sinf(animation_frame / 50) * 100));
 
@@ -104,11 +104,14 @@ Triangle_Scene::~Triangle_Scene() {
 }
 
 void Triangle_Scene::Render() {
-    const GLfloat color[] = { 0.3, 0.3, 1.0, 1.0 };
-    glClearBufferfv(GL_COLOR, 0, color);
+    const GLfloat blue[] = { 0.3, 0.3, 1.0, 1.0 };
+    glClearBufferfv(GL_COLOR, 0, blue);
 
     GLfloat offset[] = { sinf(animation_frame / 30) * 0.7, cosf(animation_frame / 30) * 0.7, 0, 0 };
     glVertexAttrib4fv(0, offset);
+
+    const GLfloat green[] = { 0.2, 1.0, 0.2, 1.0 };
+    glVertexAttrib4fv(1, green);
 
     glUseProgram(rendering_program);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -122,7 +125,13 @@ GLuint Triangle_Scene::Compile_Triangle_Shaders() {
     static const GLchar *vertex_shader_source[] = {
         "#version 450 core                                  \n"
         "                                                   \n"
+        "                                                   \n"
         "layout (location = 0) in vec4 offset;              \n"
+        "layout (location = 1) in vec4 color;               \n"
+        "                                                   \n"
+        "out VERTEX_SHADER_OUT {                            \n"
+        "   vec4 color;                                     \n"
+        "} vertex_shader_out;                               \n"
         "                                                   \n"
         "void main() {                                      \n"
         "const vec4 vertices[3] = vec4[3](                  \
@@ -131,16 +140,21 @@ GLuint Triangle_Scene::Compile_Triangle_Shaders() {
                 vec4( 0.25,  0.25, 0.5, 1.0)                \
          );                                                 \n"
         "   gl_Position = vertices[gl_VertexID] + offset;   \n"
+        "                                                   \n"
+        "   vertex_shader_out.color = color;                \n"
         "}                                                  \n"
     };
 
     static const GLchar *fragment_shader_source[] = {
         "#version 450 core                          \n"
         "                                           \n"
+        "in VERTEX_SHADER_OUT {                     \n"
+        "   vec4 color;                             \n"
+        "} fragment_shader_in;                      \n"
         "out vec4 color;                            \n"
         "                                           \n"
         "void main() {                              \n"
-        "   color = vec4(0.2, 1.0, 0.2, 1.0);       \n"
+        "   color = fragment_shader_in.color;       \n"
         "}                                          \n"
     };
 
