@@ -7,6 +7,7 @@ IMPLEMENT_APP_CONSOLE(App)
 BEGIN_EVENT_TABLE(Frame, wxFrame)
     EVT_MENU    (MENU_POINT,            Frame::Menu_Item)
     EVT_MENU    (MENU_TRIANGLE,         Frame::Menu_Item)
+    EVT_MENU    (MENU_WIREFRAME,        Frame::Menu_Item)
 
     EVT_MENU    (MENU_GL_STATE,         Frame::Menu_Item)
     EVT_MENU    (MENU_ABOUT,            Frame::Menu_Item)
@@ -35,6 +36,7 @@ Frame::Frame()
 void Frame::Setup_Menu_To_Scene_Array() {
     menu_to_scene[MENU_POINT] = Scene::POINT;
     menu_to_scene[MENU_TRIANGLE] = Scene::TRIANGLE;
+    menu_to_scene[MENU_WIREFRAME] = Scene::WIREFRAME;
 }
 
 void Frame::Setup_Menu() {
@@ -52,6 +54,7 @@ void Frame::Setup_Menu() {
 
     basic_2d_menu->Append(MENU_POINT, "Point");
     basic_2d_menu->Append(MENU_TRIANGLE, "Triangle");
+    basic_2d_menu->Append(MENU_WIREFRAME, "Wireframe");
     menu_bar->Append(basic_2d_menu, "Basic &2D");
 
     help_menu->Append(MENU_ABOUT, "&About..");

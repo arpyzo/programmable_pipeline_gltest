@@ -10,7 +10,8 @@ class Scene {
     public:
         enum Scene_Type {
             POINT,
-            TRIANGLE
+            TRIANGLE,
+            WIREFRAME
         };
 
         static Scene *Create_Scene(Scene_Type type);
@@ -21,7 +22,10 @@ class Scene {
         void Increment_Frame();
 
     protected:
-        virtual void Generate_Polygons() {}
+        virtual GLuint Compile_Shaders() { return 0; }
+
+        GLuint rendering_program;
+        GLuint vertex_array_object;
 
         float animation_frame = 0;
 };
@@ -35,26 +39,30 @@ class Point_Scene : public Scene {
         void Render();
 
     protected:
-        GLuint Compile_Point_Shaders();
-
-        GLuint rendering_program;
-        GLuint vertex_array_object;
+        GLuint Compile_Shaders();
 };
 
 /***************************** Triangle_Scene ******************************/
 class Triangle_Scene : public Scene {
-public:
-    Triangle_Scene();
-    ~Triangle_Scene();
+    public:
+        Triangle_Scene();
+        ~Triangle_Scene();
 
-    void Render();
+        void Render();
 
-protected:
-    GLuint Compile_Triangle_Shaders();
-
-    GLuint rendering_program;
-    GLuint vertex_array_object;
-
+    protected:
+        GLuint Compile_Shaders();
 };
 
+/***************************** Wireframe_Scene ******************************/
+class Wireframe_Scene : public Scene {
+    public:
+        Wireframe_Scene();
+        ~Wireframe_Scene();
+
+        void Render();
+
+    protected:
+        GLuint Compile_Shaders();
+};
 #endif // __SCENES_H

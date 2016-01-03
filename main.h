@@ -17,6 +17,7 @@ class Frame : public wxFrame {
         enum {
             MENU_POINT,
             MENU_TRIANGLE,
+            MENU_WIREFRAME,
 
             MENU_SCENES,
 

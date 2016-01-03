@@ -22,7 +22,7 @@ Canvas::Canvas(wxWindow *parent)
     }
 
     animation_timer = new wxTimer(this, TIMER_ANIMATION);
-    Switch_Scene(Scene::POINT);
+    Switch_Scene(Scene::WIREFRAME);
 }
 
 Canvas::~Canvas() {
