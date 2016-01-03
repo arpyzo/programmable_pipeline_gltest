@@ -22,7 +22,10 @@ class Scene {
         void Increment_Frame();
 
     protected:
+        void Initialize_Pipeline();
+        void Cleanup_Pipeline();
         virtual GLuint Compile_Shaders() { return 0; }
+        void Add_Shader(GLuint program, const GLchar **shader_source, GLenum shader_type);
 
         GLuint rendering_program;
         GLuint vertex_array_object;

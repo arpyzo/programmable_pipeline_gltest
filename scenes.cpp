@@ -14,6 +14,18 @@ Scene *Scene::Create_Scene(Scene_Type scene_type) {
     return new Point_Scene();
 }
 
+void Scene::Initialize_Pipeline() {
+    rendering_program = Compile_Shaders();
+
+    glCreateVertexArrays(1, &vertex_array_object);
+    glBindVertexArray(vertex_array_object);
+}
+
+void Scene::Cleanup_Pipeline() {
+    glDeleteVertexArrays(1, &vertex_array_object);
+    glDeleteProgram(rendering_program);
+}
+
 void Scene::Set_Viewport(int width, int height) {
     glViewport(0, 0, (GLint)width, (GLint)height);
 }
@@ -22,19 +34,21 @@ void Scene::Increment_Frame() {
     animation_frame++;
 }
 
+void Scene::Add_Shader(GLuint program, const GLchar **shader_source, GLenum shader_type) {
+    GLuint shader = glCreateShader(shader_type);
+    glShaderSource(shader, 1, shader_source, NULL);
+    glCompileShader(shader);
+    glAttachShader(program, shader);
+    glDeleteShader(shader);
+}
+
 /***************************** Point_Scene ******************************/
 Point_Scene::Point_Scene() {
-    rendering_program = Compile_Shaders();
-
-    glCreateVertexArrays(1, &vertex_array_object);
-    glBindVertexArray(vertex_array_object);
-
-    glPointSize(40);
+    Initialize_Pipeline();
 }
 
 Point_Scene::~Point_Scene() {
-    glDeleteVertexArrays(1, &vertex_array_object);
-    glDeleteProgram(rendering_program);
+    Cleanup_Pipeline();
 }
 
 void Point_Scene::Render() {
@@ -50,10 +64,6 @@ void Point_Scene::Render() {
 }
 
 GLuint Point_Scene::Compile_Shaders() {
-    GLuint vertex_shader;
-    GLuint fragment_shader;
-    GLuint program;
-
     static const GLchar *vertex_shader_source[] = {
         "#version 450 core                          \n"
         "                                           \n"
@@ -72,36 +82,22 @@ GLuint Point_Scene::Compile_Shaders() {
         "}                                      \n"
     };
 
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, vertex_shader_source, NULL);
-    glCompileShader(vertex_shader);
+    GLuint program = glCreateProgram();
 
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, fragment_shader_source, NULL);
-    glCompileShader(fragment_shader);
+    Add_Shader(program, vertex_shader_source, GL_VERTEX_SHADER);
+    Add_Shader(program, fragment_shader_source, GL_FRAGMENT_SHADER);
 
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
     glLinkProgram(program);
-
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
     return program;
 }
 
 /***************************** Triangle_Scene ******************************/
 Triangle_Scene::Triangle_Scene() {
-    rendering_program = Compile_Shaders();
-
-    glCreateVertexArrays(1, &vertex_array_object);
-    glBindVertexArray(vertex_array_object);
+    Initialize_Pipeline();
 }
 
 Triangle_Scene::~Triangle_Scene() {
-    glDeleteVertexArrays(1, &vertex_array_object);
-    glDeleteProgram(rendering_program);
+    Cleanup_Pipeline();
 }
 
 void Triangle_Scene::Render() {
@@ -119,10 +115,6 @@ void Triangle_Scene::Render() {
 }
 
 GLuint Triangle_Scene::Compile_Shaders() {
-    GLuint vertex_shader;
-    GLuint fragment_shader;
-    GLuint program;
-
     static const GLchar *vertex_shader_source[] = {
         "#version 450 core                                  \n"
         "                                                   \n"
@@ -158,38 +150,24 @@ GLuint Triangle_Scene::Compile_Shaders() {
         "}                                      \n"
     };
 
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, vertex_shader_source, NULL);
-    glCompileShader(vertex_shader);
+    GLuint program = glCreateProgram();
 
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, fragment_shader_source, NULL);
-    glCompileShader(fragment_shader);
+    Add_Shader(program, vertex_shader_source, GL_VERTEX_SHADER);
+    Add_Shader(program, fragment_shader_source, GL_FRAGMENT_SHADER);
 
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
     glLinkProgram(program);
-
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
     return program;
 }
 
 /***************************** Wireframe_Scene ******************************/
 Wireframe_Scene::Wireframe_Scene() {
-    rendering_program = Compile_Shaders();
-
-    glCreateVertexArrays(1, &vertex_array_object);
-    glBindVertexArray(vertex_array_object);
+    Initialize_Pipeline();
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 Wireframe_Scene::~Wireframe_Scene() {
-    glDeleteVertexArrays(1, &vertex_array_object);
-    glDeleteProgram(rendering_program);
+    Cleanup_Pipeline();
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
@@ -255,33 +233,13 @@ GLuint Wireframe_Scene::Compile_Shaders() {
         "}                                      \n"
     };
 
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, vertex_shader_source, NULL);
-    glCompileShader(vertex_shader);
-
-    GLuint tessellation_control_shader = glCreateShader(GL_TESS_CONTROL_SHADER);
-    glShaderSource(tessellation_control_shader, 1, tessellation_control_shader_source, NULL);
-    glCompileShader(tessellation_control_shader);
-
-    GLuint tessellation_evaluation_shader = glCreateShader(GL_TESS_EVALUATION_SHADER);
-    glShaderSource(tessellation_evaluation_shader, 1, tessellation_evaluation_shader_source, NULL);
-    glCompileShader(tessellation_evaluation_shader);
-
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, fragment_shader_source, NULL);
-    glCompileShader(fragment_shader);
-
     GLuint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, tessellation_control_shader);
-    glAttachShader(program, tessellation_evaluation_shader);
-    glAttachShader(program, fragment_shader);
+
+    Add_Shader(program, vertex_shader_source, GL_VERTEX_SHADER);
+    Add_Shader(program, tessellation_control_shader_source, GL_TESS_CONTROL_SHADER);
+    Add_Shader(program, tessellation_evaluation_shader_source, GL_TESS_EVALUATION_SHADER);
+    Add_Shader(program, fragment_shader_source, GL_FRAGMENT_SHADER);
+
     glLinkProgram(program);
-
-    glDeleteShader(vertex_shader);
-    glDeleteShader(tessellation_control_shader);
-    glDeleteShader(tessellation_evaluation_shader);
-    glDeleteShader(fragment_shader);
-
     return program;
 }
