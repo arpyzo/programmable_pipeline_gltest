@@ -1,0 +1,11 @@
+#version 450 core
+
+in VERTEX_SHADER_OUT {
+    vec4 color;
+} fragment_shader_in;
+
+out vec4 color;
+
+void main(void) {
+    color = fragment_shader_in.color;
+}

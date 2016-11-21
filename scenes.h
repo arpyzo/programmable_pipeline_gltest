@@ -3,7 +3,10 @@
 
 #pragma warning (disable : 4305)
 
+#include <fstream>
 #include "GLEW/glew.h"
+
+using namespace std;
 
 /***************************** Scene ******************************/
 class Scene {
@@ -24,8 +27,10 @@ class Scene {
     protected:
         void Initialize_Pipeline();
         void Cleanup_Pipeline();
+
         virtual GLuint Compile_Shaders() { return 0; }
-        void Add_Shader(GLuint program, const GLchar **shader_source, GLenum shader_type);
+        string Load_Shader(string shader_name);
+        void Add_Shader(GLuint program, string shader_name, GLenum shader_type);
 
         GLuint rendering_program;
         GLuint vertex_array_object;

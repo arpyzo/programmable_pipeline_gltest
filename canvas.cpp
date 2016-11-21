@@ -136,8 +136,5 @@ void Canvas::Display_GL_State() {
 }
 
 wxString Canvas::GLBool_Str(GLboolean gl_bool) {
-    if (gl_bool) {
-        return "True";
-    }
-    return "False";
+    return gl_bool ? "True" : "False";
 }

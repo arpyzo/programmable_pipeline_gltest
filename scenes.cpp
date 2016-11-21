@@ -34,10 +34,40 @@ void Scene::Increment_Frame() {
     animation_frame++;
 }
 
-void Scene::Add_Shader(GLuint program, const GLchar **shader_source, GLenum shader_type) {
+string Scene::Load_Shader(string shader_name) {
+    string shader_source = "";
+    ifstream shader_file("shaders/" + shader_name + ".sdr", ios::in);
+
+    if (shader_file) {
+        shader_source.assign(istreambuf_iterator<char>(shader_file), istreambuf_iterator<char>());
+        shader_file.close();
+    } else {
+        printf("Failed to load file");
+    }
+
+    return shader_source;
+}
+
+void Scene::Add_Shader(GLuint program, string shader_name, GLenum shader_type) {
+    string shader_string = Load_Shader(shader_name.c_str());
+    const GLchar *shader_source = shader_string.c_str();
+
+
     GLuint shader = glCreateShader(shader_type);
-    glShaderSource(shader, 1, shader_source, NULL);
+    glShaderSource(shader, 1, &shader_source, NULL);
     glCompileShader(shader);
+
+    GLint compile_status;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
+    if (compile_status != GL_TRUE) {
+        printf("Shader compilation failed!");
+
+        GLchar compile_log[1024];
+        glGetShaderInfoLog(shader, sizeof(compile_log), NULL, compile_log);
+        printf("%s", compile_log);
+        return;
+    }
+
     glAttachShader(program, shader);
     glDeleteShader(shader);
 }
@@ -64,28 +94,10 @@ void Point_Scene::Render() {
 }
 
 GLuint Point_Scene::Compile_Shaders() {
-    static const GLchar *vertex_shader_source[] = {
-        "#version 450 core                          \n"
-        "                                           \n"
-        "void main(void)   {                        \n"
-        "   gl_Position = vec4(0.0, 0.0, 1.0, 1.0); \n"
-        "}                                          \n"
-    };
-
-    static const GLchar *fragment_shader_source[] = {
-        "#version 450 core                      \n"
-        "                                       \n"
-        "out vec4 color;                        \n"
-        "                                       \n"
-        "void main(void) {                      \n"
-        "   color = vec4(0.3, 0.3, 1.0, 1.0);   \n"
-        "}                                      \n"
-    };
-
     GLuint program = glCreateProgram();
 
-    Add_Shader(program, vertex_shader_source, GL_VERTEX_SHADER);
-    Add_Shader(program, fragment_shader_source, GL_FRAGMENT_SHADER);
+    Add_Shader(program, "point_vertex", GL_VERTEX_SHADER);
+    Add_Shader(program, "point_fragment", GL_FRAGMENT_SHADER);
 
     glLinkProgram(program);
     return program;
@@ -115,45 +127,10 @@ void Triangle_Scene::Render() {
 }
 
 GLuint Triangle_Scene::Compile_Shaders() {
-    static const GLchar *vertex_shader_source[] = {
-        "#version 450 core                                  \n"
-        "                                                   \n"
-        "layout (location = 0) in vec4 offset;              \n"
-        "layout (location = 1) in vec4 color;               \n"
-        "                                                   \n"
-        "out VERTEX_SHADER_OUT {                            \n"
-        "   vec4 color;                                     \n"
-        "} vertex_shader_out;                               \n"
-        "                                                   \n"
-        "void main(void) {                                  \n"
-        "const vec4 vertices[3] = vec4[3](                  \
-                vec4( 0.25, -0.25, 0.5, 1.0),               \
-                vec4(-0.25, -0.25, 0.5, 1.0),               \
-                vec4( 0.25,  0.25, 0.5, 1.0)                \
-         );                                                 \n"
-        "   gl_Position = vertices[gl_VertexID] + offset;   \n"
-        "                                                   \n"
-        "   vertex_shader_out.color = color;                \n"
-        "}                                                  \n"
-    };
-
-    static const GLchar *fragment_shader_source[] = {
-        "#version 450 core                      \n"
-        "                                       \n"
-        "in VERTEX_SHADER_OUT {                 \n"
-        "   vec4 color;                         \n"
-        "} fragment_shader_in;                  \n"
-        "out vec4 color;                        \n"
-        "                                       \n"
-        "void main(void) {                      \n"
-        "   color = fragment_shader_in.color;   \n"
-        "}                                      \n"
-    };
-
     GLuint program = glCreateProgram();
 
-    Add_Shader(program, vertex_shader_source, GL_VERTEX_SHADER);
-    Add_Shader(program, fragment_shader_source, GL_FRAGMENT_SHADER);
+    Add_Shader(program, "triangle_vertex", GL_VERTEX_SHADER);
+    Add_Shader(program, "triangle_fragment", GL_FRAGMENT_SHADER);
 
     glLinkProgram(program);
     return program;
@@ -181,64 +158,12 @@ void Wireframe_Scene::Render() {
 }
 
 GLuint Wireframe_Scene::Compile_Shaders() {
-    static const GLchar *vertex_shader_source[] = {
-        "#version 450 core                                  \n"
-        "                                                   \n"
-        "void main(void) {                                  \n"
-        "    const vec4 vertices[3] = vec4[3](              \
-                 vec4( 0.25, -0.25, 0.5, 1.0),              \
-                 vec4(-0.25, -0.25, 0.5, 1.0),              \
-                 vec4( 0.25,  0.25, 0.5, 1.0)               \
-             );                                             \n"
-        "    gl_Position = vertices[gl_VertexID];           \n"
-        "}                                                  \n"
-    };
-
-    static const GLchar *tessellation_control_shader_source[] = {
-        "#version 450 core                                                              \n"
-        "                                                                               \n"
-        "layout (vertices = 3) out;                                                     \n"
-        "                                                                               \n"
-        "void main(void) {                                                              \n"
-        "   if (gl_InvocationID == 0) {                                                 \n"
-        "       gl_TessLevelInner[0] = 5.0;                                             \n"
-        "       gl_TessLevelOuter[0] = 5.0;                                             \n"
-        "       gl_TessLevelOuter[1] = 5.0;                                             \n"
-        "       gl_TessLevelOuter[2] = 5.0;                                             \n"
-        "   }                                                                           \n"
-        "                                                                               \n"
-        "   gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;   \n"
-        "}                                                                              \n"
-    };
-
-    static const GLchar *tessellation_evaluation_shader_source[] = {
-        "#version 450 core                                              \n"
-        "                                                               \n"
-        "layout (triangles, equal_spacing, cw) in;                      \n"
-        "                                                               \n"
-        "void main(void) {                                              \n"
-        "   gl_Position = (gl_TessCoord.x * gl_in[0].gl_Position) +     \n"
-        "                 (gl_TessCoord.y * gl_in[1].gl_Position) +     \n"
-        "                 (gl_TessCoord.z * gl_in[2].gl_Position);      \n"
-        "}                                                              \n" 
-    };
-
-    static const GLchar *fragment_shader_source[] = {
-        "#version 450 core                      \n"
-        "                                       \n"
-        "out vec4 color;                        \n"
-        "                                       \n"
-        "void main(void) {                      \n"
-        "   color = vec4(1.0, 1.0, 1.0, 1.0);   \n"
-        "}                                      \n"
-    };
-
     GLuint program = glCreateProgram();
 
-    Add_Shader(program, vertex_shader_source, GL_VERTEX_SHADER);
-    Add_Shader(program, tessellation_control_shader_source, GL_TESS_CONTROL_SHADER);
-    Add_Shader(program, tessellation_evaluation_shader_source, GL_TESS_EVALUATION_SHADER);
-    Add_Shader(program, fragment_shader_source, GL_FRAGMENT_SHADER);
+    Add_Shader(program, "wireframe_vertex", GL_VERTEX_SHADER);
+    Add_Shader(program, "wireframe_tessellation_control", GL_TESS_CONTROL_SHADER);
+    Add_Shader(program, "wireframe_tessellation_evaluation", GL_TESS_EVALUATION_SHADER);
+    Add_Shader(program, "wireframe_fragment", GL_FRAGMENT_SHADER);
 
     glLinkProgram(program);
     return program;

@@ -69,7 +69,7 @@ void Frame::Menu_Item(wxCommandEvent &event) {
             gl_canvas->Display_GL_State();
             return;
         case MENU_ABOUT:
-            wxMessageBox("GLTest\nOpenGL Programmable Pipeline\nDemonstration Program\nRobert E. Pyzalski 2015", "About..", wxICON_INFORMATION);
+            wxMessageBox("GLTest\nOpenGL Programmable Pipeline\nDemonstration Program\nRobert E. Pyzalski 2016", "About..", wxICON_INFORMATION);
             return;
         case MENU_QUIT:
             Close(TRUE);
