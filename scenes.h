@@ -12,6 +12,7 @@ using namespace std;
 class Scene {
     public:
         enum Scene_Type {
+            BLANK,
             POINT,
             TRIANGLE,
             WIREFRAME
@@ -20,7 +21,7 @@ class Scene {
         static Scene *Create_Scene(Scene_Type type);
         virtual ~Scene() {}
 
-        virtual void Set_Viewport(int width, int height);
+        void Set_Viewport(int width, int height);
         virtual void Render() {}
         void Increment_Frame();
 
@@ -36,6 +37,15 @@ class Scene {
         GLuint vertex_array_object;
 
         float animation_frame = 0;
+};
+
+/***************************** Blank_Scene ******************************/
+class Blank_Scene : public Scene {
+public:
+    Blank_Scene() {}
+    ~Blank_Scene() {}
+
+    void Render();
 };
 
 /***************************** Point_Scene ******************************/

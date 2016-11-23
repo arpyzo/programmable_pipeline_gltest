@@ -4,14 +4,14 @@
 /***************************** Scene ******************************/
 Scene *Scene::Create_Scene(Scene_Type scene_type) {
     switch(scene_type) {
+        case BLANK: return new Blank_Scene();
         case POINT: return new Point_Scene();
         case TRIANGLE: return new Triangle_Scene();
         case WIREFRAME: return new Wireframe_Scene();
         default: 
             printf("ERROR: invalid scene type!");
     }
-    // TODO: Create blank scene for this
-    return new Point_Scene();
+    return new Blank_Scene();
 }
 
 void Scene::Initialize_Pipeline() {
@@ -41,8 +41,9 @@ string Scene::Load_Shader(string shader_name) {
     if (shader_file) {
         shader_source.assign(istreambuf_iterator<char>(shader_file), istreambuf_iterator<char>());
         shader_file.close();
+        printf("Loaded shader \"%s\"", shader_name);
     } else {
-        printf("Failed to load file");
+        printf("Failed to load shader \"%s\"", shader_name);
     }
 
     return shader_source;
@@ -70,6 +71,15 @@ void Scene::Add_Shader(GLuint program, string shader_name, GLenum shader_type) {
 
     glAttachShader(program, shader);
     glDeleteShader(shader);
+}
+
+/***************************** Blank_Scene ******************************/
+void Blank_Scene::Render() {
+    const GLfloat black[] = { 0.0, 0.0, 0.0, 0.0 };
+
+    glClearBufferfv(GL_COLOR, 0, black);
+
+    glFlush();
 }
 
 /***************************** Point_Scene ******************************/

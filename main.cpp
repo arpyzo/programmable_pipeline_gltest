@@ -1,7 +1,7 @@
 #include "main.h"
 #include "debug.h"
 
-IMPLEMENT_APP_CONSOLE(App)
+IMPLEMENT_APP(App)
 
 /***************************** Frame ******************************/
 BEGIN_EVENT_TABLE(Frame, wxFrame)

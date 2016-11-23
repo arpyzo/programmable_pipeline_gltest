@@ -14,15 +14,14 @@ Canvas::Canvas(wxWindow *parent)
     gl_context = new wxGLContext(this);
     SetCurrent(*gl_context);
     
-    GLenum glew_init_result = glewInit();
-    if (glew_init_result != GLEW_OK) {
+    if (glewInit() != GLEW_OK) {
         wxMessageBox("Failure to initialize GLEW!");
         // TODO: Confirmation and exit
         // parent->Close(???bool);
     }
 
     animation_timer = new wxTimer(this, TIMER_ANIMATION);
-    Switch_Scene(Scene::WIREFRAME);
+    Switch_Scene(Scene::BLANK);
 }
 
 Canvas::~Canvas() {
@@ -51,8 +50,6 @@ void Canvas::Event_Resize(wxSizeEvent &WXUNUSED(event)) {
         GetClientSize(&width, &height);
         scene->Set_Viewport(width, height);
     }
-
-    // TODO: This needs further work
 }
 
 void Canvas::Event_Erase_Background(wxEraseEvent &WXUNUSED(event)) { }
